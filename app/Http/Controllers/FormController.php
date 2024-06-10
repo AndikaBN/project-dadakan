@@ -43,15 +43,24 @@ class FormController extends Controller
 
     public function getFormDetail($slug)
     {
-        $form = Form::where('slug', $slug)->with('questions')->firstOrFail();
+        // Cari formulir berdasarkan slug
+        $form = Form::where('slug', $slug)->first();
 
+        // Jika formulir tidak ditemukan, kirim respons 404
+        if (!$form) {
+            return response()->json(['message' => 'Form not found'], 404);
+        }
+
+        // Periksa apakah pengguna memiliki izin untuk mengakses formulir
         if ($form->creator_id !== Auth::id()) {
             return response()->json(['message' => 'Forbidden access'], 403);
         }
 
+        // Jika berhasil, kirim respons formulir
         return response()->json([
             'message' => 'Get form success',
             'form' => $form,
         ], 200);
     }
+
 }
